@@ -32,7 +32,7 @@ export function ChatHeader(): React.JSX.Element {
             <h1 className="text-lg font-semibold text-slate-100">
               T-Level Revision Assistant
             </h1>
-            <p className="text-xs text-slate-400">Your AI-powered study partner for T-Levels.</p>
+            <p className="text-xs text-slate-400">Your AI-powered study partner for T-Levels (Animal Management).</p>
           </div>
         </div>
 
