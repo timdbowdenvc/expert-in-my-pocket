@@ -20,6 +20,9 @@ wheels/
 *.egg
 MANIFEST
 
+# AI Docs
+ai_docs/
+
 # Virtual environments
 .venv/
 venv/

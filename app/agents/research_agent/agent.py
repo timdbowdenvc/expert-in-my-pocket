@@ -4,7 +4,7 @@ import google.genai.types as genai_types
 from google.adk.agents import LlmAgent
 from google.adk.planners import BuiltInPlanner
 
-from app.config import config
+from .config import config
 
 # --- ROOT AGENT DEFINITION ---
 root_agent = LlmAgent(

@@ -9,7 +9,7 @@ import datetime
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import vertexai
 from google.adk.artifacts import GcsArtifactService
@@ -19,11 +19,19 @@ from opentelemetry.sdk.trace import TracerProvider, export
 from vertexai import agent_engines
 from vertexai.preview.reasoning_engines import AdkApp
 
-from app.agent import root_agent
-from app.config import config, get_deployment_config
+from app.agents.rag_agent.agent import root_agent as rag_agent
+from app.agents.research_agent.agent import root_agent as research_agent
+from app.agents.research_agent.config import get_deployment_config
 from app.utils.gcs import create_bucket_if_not_exists
 from app.utils.tracing import CloudTraceLoggingSpanExporter
 from app.utils.typing import Feedback
+
+
+class AgentDeploymentConfig(TypedDict):
+    agent: Any
+    name: str
+    description: str
+    packages: list[str]
 
 
 class AgentEngineApp(AdkApp):
@@ -75,41 +83,35 @@ class AgentEngineApp(AdkApp):
         )
 
 
-def deploy_agent_engine_app() -> agent_engines.AgentEngine:
+def deploy_agent(
+    agent: Any, agent_name: str, agent_description: str, extra_packages: list[str]
+) -> agent_engines.AgentEngine:
     """
-    Deploy the agent to Vertex AI Agent Engine.
+    Deploy a single agent to Vertex AI Agent Engine.
 
-    This function:
-    1. Gets deployment configuration from environment variables
-    2. Creates required Google Cloud Storage buckets
-    3. Deploys the agent to Agent Engine
-    4. Saves deployment metadata to logs/deployment_metadata.json
+    Args:
+        agent: The agent instance to deploy.
+        agent_name: The display name for the agent.
+        agent_description: A description for the agent.
+        extra_packages: A list of extra packages to include in the deployment.
 
     Returns:
-        The deployed agent engine instance
+        The deployed agent engine instance.
     """
-    print("🚀 Starting Agent Engine deployment...")
+    print(f"🚀 Starting deployment for agent: {agent_name}...")
 
     # Step 1: Get deployment configuration
     deployment_config = get_deployment_config()
-    print(f"📋 Deploying agent: {deployment_config.agent_name}")
     print(f"📋 Project: {deployment_config.project}")
     print(f"📋 Location: {deployment_config.location}")
     print(f"📋 Staging bucket: {deployment_config.staging_bucket}")
 
     # Step 2: Set up environment variables for the deployed agent
-    env_vars = {}
-
-    # Configure worker parallelism
-    env_vars["NUM_WORKERS"] = "1"
+    env_vars = {"NUM_WORKERS": "1"}
 
     # Step 3: Create required Google Cloud Storage buckets
-    artifacts_bucket_name = (
-        f"{deployment_config.project}-{deployment_config.agent_name}-logs-data"
-    )
-
+    artifacts_bucket_name = f"{deployment_config.project}-{agent_name}-logs-data"
     print(f"📦 Creating artifacts bucket: {artifacts_bucket_name}")
-
     create_bucket_if_not_exists(
         bucket_name=artifacts_bucket_name,
         project=deployment_config.project,
@@ -129,7 +131,7 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
 
     # Step 6: Create the agent engine app
     agent_engine = AgentEngineApp(
-        agent=root_agent,
+        agent=agent,
         artifact_service_builder=lambda: GcsArtifactService(
             bucket_name=artifacts_bucket_name
         ),
@@ -138,46 +140,70 @@ def deploy_agent_engine_app() -> agent_engines.AgentEngine:
     # Step 7: Configure the agent for deployment
     agent_config = {
         "agent_engine": agent_engine,
-        "display_name": deployment_config.agent_name,
-        "description": "A simple goal planning agent",
-        "extra_packages": deployment_config.extra_packages,
+        "display_name": agent_name,
+        "description": agent_description,
+        "extra_packages": extra_packages,
         "env_vars": env_vars,
         "requirements": requirements,
     }
 
     # Step 8: Deploy or update the agent
-    existing_agents = list(
-        agent_engines.list(filter=f"display_name={deployment_config.agent_name}")
-    )
+    existing_agents = list(agent_engines.list(filter=f"display_name='{agent_name}'"))
 
     if existing_agents:
-        print(f"🔄 Updating existing agent: {deployment_config.agent_name}")
+        print(f"🔄 Updating existing agent: {agent_name}")
         remote_agent = existing_agents[0].update(**agent_config)
     else:
-        print(f"🆕 Creating new agent: {deployment_config.agent_name}")
+        print(f"🆕 Creating new agent: {agent_name}")
         remote_agent = agent_engines.create(**agent_config)
 
     # Step 9: Save deployment metadata
     metadata = {
         "remote_agent_engine_id": remote_agent.resource_name,
         "deployment_timestamp": datetime.datetime.now().isoformat(),
-        "agent_name": deployment_config.agent_name,
+        "agent_name": agent_name,
         "project": deployment_config.project,
         "location": deployment_config.location,
     }
 
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
-    metadata_file = logs_dir / "deployment_metadata.json"
+    metadata_file = logs_dir / f"deployment_metadata_{agent_name}.json"
 
     with open(metadata_file, "w") as f:
         json.dump(metadata, f, indent=2)
 
-    print("✅ Agent deployed successfully!")
+    print(f"✅ Agent {agent_name} deployed successfully!")
     print(f"📄 Deployment metadata saved to: {metadata_file}")
     print(f"🆔 Agent Engine ID: {remote_agent.resource_name}")
 
     return remote_agent
+
+
+def deploy_all_agents() -> None:
+    """Deploys all agents defined in the application."""
+    agents_to_deploy: list[AgentDeploymentConfig] = [
+        {
+            "agent": research_agent,
+            "name": "research-agent",
+            "description": "A research agent that can browse the web and generate reports.",
+            "packages": ["./app/agents/research_agent", "./app/utils"],
+        },
+        {
+            "agent": rag_agent,
+            "name": "rag-agent",
+            "description": "A RAG agent that can answer questions about documents.",
+            "packages": ["./app/agents/rag_agent", "./app/utils"],
+        },
+    ]
+
+    for agent_config in agents_to_deploy:
+        deploy_agent(
+            agent=agent_config["agent"],
+            agent_name=agent_config["name"],
+            agent_description=agent_config["description"],
+            extra_packages=agent_config["packages"],
+        )
 
 
 if __name__ == "__main__":
@@ -191,4 +217,4 @@ if __name__ == "__main__":
     """
     )
 
-    deploy_agent_engine_app()
+    deploy_all_agents()

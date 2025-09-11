@@ -1,12 +1,12 @@
 install:
 	@command -v uv >/dev/null 2>&1 || { echo "uv is not installed. Installing uv..."; curl -LsSf https://astral.sh/uv/0.6.12/install.sh | sh; source $HOME/.local/bin/env; }
-	uv sync && npm --prefix nextjs install
+	uv sync --all-extras && npm --prefix nextjs install
 
 dev:
 	make dev-backend & make dev-frontend
 
 dev-backend:
-	uv run adk api_server app --allow_origins="*"
+	uv run adk api_server app/agents --allow_origins="*"
 
 dev-frontend:
 	npm --prefix nextjs run dev
@@ -16,8 +16,8 @@ adk-web:
 
 lint:
 	uv run codespell
-	uv run ruff check . --diff
-	uv run ruff format . --check --diff
+	uv run ruff check . --fix
+	uv run ruff format .
 	uv run mypy .
 
 # Deploy the agent remotely

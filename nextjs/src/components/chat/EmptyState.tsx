@@ -3,7 +3,7 @@
 import { Target, ListChecks, CheckCircle } from "lucide-react";
 
 /**
- * EmptyState - AI Goal Planner welcome screen
+ * EmptyState - T-Level Revision Assistant welcome screen
  * Extracted from ChatMessagesView empty state section
  * Displays when no messages exist in the current session
  */
@@ -24,16 +24,14 @@ export function EmptyState(): React.JSX.Element {
               <CheckCircle className="w-6 h-6 text-purple-500" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white">AI Goal Planner</h1>
-          <p className="text-xl text-neutral-300">Powered by Google Gemini</p>
+          <h1 className="text-4xl font-bold text-white">T-Level Revision Assistant</h1>
+          <p className="text-xl text-neutral-300">Your AI-powered study partner for T-Levels.</p>
         </div>
 
         {/* Description */}
         <div className="space-y-4">
           <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-            Transform your goals into actionable plans with structured task
-            breakdown, clear priorities, and step-by-step guidance to achieve
-            success.
+            Get help with revision, practice questions, and understanding key concepts.
           </p>
         </div>
 
@@ -43,46 +41,46 @@ export function EmptyState(): React.JSX.Element {
             <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto">
               <Target className="w-6 h-6 text-green-500" />
             </div>
-            <h3 className="font-semibold text-green-400">Goal Planning</h3>
+            <h3 className="font-semibold text-green-400">T-Level Revision</h3>
             <p className="text-sm text-neutral-400">
-              Strategic breakdown and clear roadmap creation
+              Covers all T-Level subjects and specifications.
             </p>
           </div>
           <div className="space-y-3">
             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto">
               <ListChecks className="w-6 h-6 text-blue-500" />
             </div>
-            <h3 className="font-semibold text-blue-400">Task Breakdown</h3>
+            <h3 className="font-semibold text-blue-400">Practice Questions</h3>
             <p className="text-sm text-neutral-400">
-              Organized tasks and subtasks with priorities
+              Generate practice questions and get feedback on your answers.
             </p>
           </div>
           <div className="space-y-3">
             <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto">
               <CheckCircle className="w-6 h-6 text-purple-500" />
             </div>
-            <h3 className="font-semibold text-purple-400">Achievement Path</h3>
+            <h3 className="font-semibold text-purple-400">Key Concept Explanations</h3>
             <p className="text-sm text-neutral-400">
-              Clear steps and milestones to reach your goals
+              Get clear explanations of difficult concepts.
             </p>
           </div>
         </div>
 
         {/* Try asking about section */}
         <div className="space-y-4">
-          <p className="text-neutral-400">Try asking about:</p>
+          <p className="text-neutral-400">Try asking for:</p>
           <div className="flex flex-wrap gap-2 justify-center">
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Goal setting strategies
+              A summary of the Digital T-Level
             </span>
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Project planning methods
+              Practice questions for the Health T-Level
             </span>
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Task prioritization
+              An explanation of core concepts in the Construction T-Level
             </span>
             <span className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-sm">
-              Achievement milestones
+              Help with my revision schedule
             </span>
           </div>
         </div>

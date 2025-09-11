@@ -8,38 +8,6 @@ export interface Message {
   timestamp: Date;
 }
 
-// Goal planning types
-export interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Task {
-  id: string;
-  goalId: string;
-  title: string;
-  description: string;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
-  priority: "low" | "medium" | "high";
-  dependencies: string[]; // Task IDs that must be completed first
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface SubTask {
-  id: string;
-  taskId: string;
-  title: string;
-  description: string;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 // Single agent response types
 export interface AgentMessage {
   parts: { text: string }[];
@@ -53,33 +21,16 @@ export interface AgentResponse {
     promptTokenCount: number;
     totalTokenCount: number;
   };
-  planningData?: {
-    goal?: Goal;
-    tasks?: Task[];
-    subTasks?: SubTask[];
-    currentPhase?:
-      | "analysis"
-      | "planning"
-      | "breakdown"
-      | "execution"
-      | "review";
-  };
 }
 
-// Timeline event types for goal planning
+// Timeline event types
 export interface TimelineEvent {
   id: string;
-  type:
-    | "goal_created"
-    | "task_created"
-    | "task_completed"
-    | "goal_completed"
-    | "planning_started"
-    | "planning_completed";
+  type: "message_sent" | "message_received" | "error";
   title: string;
   description: string;
   timestamp: Date;
-  relatedId?: string; // ID of related goal, task, or subtask
+  relatedId?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -90,7 +41,7 @@ export interface SSEEvent {
 }
 
 export interface ProcessedEvent {
-  type: "text" | "planning" | "goal" | "task" | "status" | "error";
+  type: "text" | "thought" | "status" | "error";
   content: string;
   timestamp: Date;
   metadata?: Record<string, unknown>;
@@ -100,9 +51,6 @@ export interface ProcessedEvent {
 export interface ChatSession {
   id: string;
   userId: string;
-  goal?: Goal;
-  tasks: Task[];
-  subTasks: SubTask[];
   messages: Message[];
   timeline: TimelineEvent[];
   createdAt: Date;
@@ -115,13 +63,6 @@ export type ApiResponse<T> =
   | { success: false; error: string };
 
 // Form types
-export interface GoalInput {
-  title: string;
-  description: string;
-}
-
-export interface TaskInput {
-  title: string;
-  description: string;
-  priority: "low" | "medium" | "high";
+export interface MessageInput {
+  text: string;
 }

@@ -26,9 +26,9 @@ def load_environment_variables() -> None:
             load_dotenv(env_file)
             print(f"✅ Loaded environment variables from {env_file}")
         else:
-            print(f"ℹ️  No .env file found at {env_file}")
+            print(f"(i)  No .env file found at {env_file}")
     except ImportError:
-        print("ℹ️  python-dotenv not installed, skipping .env file loading")
+        print("(i)  python-dotenv not installed, skipping .env file loading")
 
 
 # =============================================================================
@@ -142,11 +142,11 @@ def initialize_vertex_ai(config: AgentConfiguration) -> None:
         else:
             vertexai.init(project=config.project_id, location=config.location)
 
-        print(f"✅ Vertex AI initialized successfully!")
+        print("✅ Vertex AI initialized successfully!")
 
         if not config.staging_bucket:
             print(
-                "ℹ️  Add GOOGLE_CLOUD_STAGING_BUCKET to .env for Agent Engine deployment"
+                "(i)  Add GOOGLE_CLOUD_STAGING_BUCKET to .env for Agent Engine deployment"
             )
 
     except Exception as e:

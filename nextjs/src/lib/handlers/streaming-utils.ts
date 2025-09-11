@@ -26,14 +26,14 @@ export function createPassThroughStream(
     start(controller) {
       if (!sourceResponse.body) {
         console.log(
-          `❌ No response body from ${deploymentType} for goal planning`
+          `❌ No response body from ${deploymentType} for revision assistant`
         );
         controller.close();
         return;
       }
 
       console.log(
-        `✅ ${deploymentType} goal planning response body exists, starting stream reader...`
+        `✅ ${deploymentType} revision assistant response body exists, starting stream reader...`
       );
 
       const reader = sourceResponse.body.getReader();
@@ -67,12 +67,12 @@ export function createPassThroughStream(
           }
         } catch (error) {
           console.error(
-            `❌ Error reading ${deploymentType} goal planning stream:`,
+            `❌ Error reading ${deploymentType} revision assistant stream:`,
             error
           );
         } finally {
           console.log(
-            `🔚 Closing goal planning stream controller after ${chunkCount} chunks`
+            `🔚 Closing revision assistant stream controller after ${chunkCount} chunks`
           );
           controller.close();
         }
@@ -92,7 +92,7 @@ export function validateStreamingResponse(
 ): boolean {
   if (!response.ok) {
     console.error(
-      `❌ ${deploymentType} goal planning stream error:`,
+      `❌ ${deploymentType} revision assistant stream error:`,
       response.status,
       response.statusText
     );

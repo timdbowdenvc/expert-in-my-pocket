@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
-import { GoalInput } from "@/types";
+import { MessageInput } from "@/types";
 
 /**
  * Common types shared by all deployment strategies
  */
 export interface ProcessedRequest {
-  goal: GoalInput;
+  message: MessageInput;
   sessionId: string;
   userId: string;
 }
@@ -39,13 +39,13 @@ export async function parseRequest(request: NextRequest): Promise<{
 }> {
   try {
     const requestBody = (await request.json()) as {
-      goal: GoalInput;
+      message: MessageInput;
       sessionId?: string;
       userId?: string;
     };
 
     // Validate required fields
-    const validation = validateGoalRequest(requestBody);
+    const validation = validateMessageRequest(requestBody);
     if (!validation.isValid) {
       return { data: null, validation };
     }
@@ -76,7 +76,7 @@ export async function parseRequest(request: NextRequest): Promise<{
 
     return {
       data: {
-        goal: requestBody.goal,
+        message: requestBody.message,
         sessionId,
         userId,
       },
@@ -95,37 +95,31 @@ export async function parseRequest(request: NextRequest): Promise<{
 }
 
 /**
- * Validate the goal request structure
+ * Validate the message request structure
  */
-export function validateGoalRequest(requestBody: {
-  goal: GoalInput;
+export function validateMessageRequest(requestBody: {
+  message: MessageInput;
   sessionId?: string;
   userId?: string;
 }): ValidationResult {
-  if (!requestBody.goal?.title || !requestBody.goal?.description) {
+  if (!requestBody.message?.text) {
     return {
       isValid: false,
-      error: "Goal title and description are required",
+      error: "Message text is required",
     };
   }
 
-  if (
-    typeof requestBody.goal.title !== "string" ||
-    typeof requestBody.goal.description !== "string"
-  ) {
+  if (typeof requestBody.message.text !== "string") {
     return {
       isValid: false,
-      error: "Goal title and description must be strings",
+      error: "Message text must be a string",
     };
   }
 
-  if (
-    requestBody.goal.title.trim().length === 0 ||
-    requestBody.goal.description.trim().length === 0
-  ) {
+  if (requestBody.message.text.trim().length === 0) {
     return {
       isValid: false,
-      error: "Goal title and description cannot be empty",
+      error: "Message text cannot be empty",
     };
   }
 
@@ -133,23 +127,23 @@ export function validateGoalRequest(requestBody: {
 }
 
 /**
- * Format goal data into a message string
+ * Format message data into a message string
  */
-export function formatGoalMessage(goal: GoalInput): string {
-  return `Goal: ${goal.title}\n\nDescription: ${goal.description}`;
+export function formatMessage(message: MessageInput): string {
+  return message.text;
 }
 
 /**
- * Centralized logging for goal planning operations
+ * Centralized logging for revision assistant operations
  */
-export function logGoalPlanningRequest(
+export function logRevisionAssistantRequest(
   sessionId: string,
   userId: string,
-  goal: GoalInput,
+  message: MessageInput,
   deploymentType: "agent_engine" | "local_backend"
 ): void {
   console.log(
-    `📡 Goal Planning API [${deploymentType}] - Session: ${sessionId}, User: ${userId}`
+    `📡 Revision Assistant API [${deploymentType}] - Session: ${sessionId}, User: ${userId}`
   );
-  console.log(`📡 Goal:`, goal);
+  console.log(`📡 Message:`, message);
 }

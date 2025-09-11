@@ -14,7 +14,7 @@ export interface StandardErrorResponse {
 /**
  * Error types for better error categorization
  */
-export enum GoalPlanningErrorType {
+export enum RevisionAssistantErrorType {
   VALIDATION_ERROR = "VALIDATION_ERROR",
   AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR",
   BACKEND_CONNECTION_ERROR = "BACKEND_CONNECTION_ERROR",
@@ -129,7 +129,7 @@ export function createSessionCreationError(
  * Create generic internal server error response (500)
  */
 export function createInternalServerError(
-  message: string = "Failed to process goal planning request",
+  message: string = "Failed to process revision assistant request",
   error?: Error | unknown,
   details?: string
 ): NextResponse<ApiResponse<never>> {
@@ -145,7 +145,7 @@ export function createInternalServerError(
  * Log error details for debugging
  */
 export function logError(
-  errorType: GoalPlanningErrorType,
+  errorType: RevisionAssistantErrorType,
   deploymentType: "agent_engine" | "local_backend" | "general",
   error: Error | unknown,
   context?: Record<string, unknown>
@@ -186,7 +186,7 @@ export async function handleFetchError(
   if (error instanceof TypeError && error.message.includes("fetch")) {
     // Network/connection error
     logError(
-      GoalPlanningErrorType.BACKEND_CONNECTION_ERROR,
+      RevisionAssistantErrorType.BACKEND_CONNECTION_ERROR,
       deploymentType,
       error,
       { operation }
@@ -201,7 +201,7 @@ export async function handleFetchError(
   }
 
   // Generic error
-  logError(GoalPlanningErrorType.INTERNAL_SERVER_ERROR, deploymentType, error, {
+  logError(RevisionAssistantErrorType.INTERNAL_SERVER_ERROR, deploymentType, error, {
     operation,
   });
 
@@ -219,7 +219,7 @@ export async function validateStreamingResponseOrCreateError(
     const errorDetails = await extractErrorFromResponse(response);
 
     logError(
-      GoalPlanningErrorType.BACKEND_CONNECTION_ERROR,
+      RevisionAssistantErrorType.BACKEND_CONNECTION_ERROR,
       deploymentType,
       new Error(
         `Stream response error: ${response.status} ${response.statusText}`
@@ -237,7 +237,7 @@ export async function validateStreamingResponseOrCreateError(
 
   if (!response.body) {
     logError(
-      GoalPlanningErrorType.STREAMING_ERROR,
+      RevisionAssistantErrorType.STREAMING_ERROR,
       deploymentType,
       new Error("No response body for streaming")
     );

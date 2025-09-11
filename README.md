@@ -1,12 +1,12 @@
-# ADK Fullstack Deploy Tutorial
+# T-Level Revision Assistant
 
-Production-ready fullstack template showing how to wire a Python ADK backend to a modern Next.js frontend with streaming responses, local development, and deployment paths to Vertex AI Agent Engine and Vercel.
+A production-ready fullstack template for a T-Level Revision Assistant, demonstrating how to connect a Python ADK backend to a modern Next.js frontend with streaming responses, local development, and deployment paths to Vertex AI Agent Engine and Vercel.
 
 This repo contains:
 
-- Backend: Python app using Google ADK to run a goal-planning LLM agent
-- Frontend: Next.js app with a chat UI, activity timeline, and SSE streaming
-- Make targets and scripts to run locally and deploy
+- Backend: A Python application using the Google ADK to power a T-Level revision assistant.
+- Frontend: A Next.js application providing a chat interface for students.
+- Make targets and scripts for local development and cloud deployment.
 
 ## Quickstart
 
@@ -29,7 +29,7 @@ By default the frontend runs at `http://localhost:3000` and proxies chat request
 
 ## Features
 
-- Goal-planning LLM agent powered by Google ADK (`app/agent.py`)
+- T-Level Revision Assistant powered by Google ADK (`app/agents/rag_agent/agent.py`)
 - Environment-driven routing to either local backend or Vertex AI Agent Engine
 - Robust SSE pipeline with JSON-fragment processing for Agent Engine
 - Chat UI with message list, streaming content, and activity timeline
@@ -45,7 +45,7 @@ By default the frontend runs at `http://localhost:3000` and proxies chat request
 
 ```
 app/                       # Python ADK backend
-  agent.py                 # Root agent definition (goal-planning)
+  agents/rag_agent/agent.py # Root agent definition (T-Level Revision Assistant)
   agent_engine_app.py      # Deployment helper for Vertex AI Agent Engine
   config.py                # Env loading, Vertex init, deployment config
   utils/                   # GCS + tracing helpers
@@ -65,7 +65,7 @@ pyproject.toml             # Python deps and linters
 
 ### Agent
 
-`app/agent.py` defines an ADK `LlmAgent` with built-in planning enabled. It accepts a high-level goal and produces a structured plan and execution steps. The model defaults to `gemini-2.5-flash` and can be changed via env.
+The agent is defined in `app/agents/rag_agent/agent.py`. It's a Retrieval Augmented Generation (RAG) agent that can answer questions about documents. For the T-Level Revision Assistant, you would populate its corpus with revision materials.
 
 ### Environment
 
@@ -83,7 +83,7 @@ GOOGLE_CLOUD_STAGING_BUCKET=my-staging-bucket
 
 # Optional
 MODEL=gemini-2.5-flash
-AGENT_NAME=goal-planning-agent
+AGENT_NAME=t-level-revision-agent
 EXTRA_PACKAGES=./app
 REQUIREMENTS_FILE=.requirements.txt
 ```
@@ -103,7 +103,7 @@ make dev-backend
 make dev
 ```
 
-This uses `uv run adk api_server app --allow_origins="*"` which serves the ADK HTTP API at `http://127.0.0.1:8000`.
+This uses `uv run adk api_server app/agents --allow_origins="*"` which serves the ADK HTTP API at `http://127.0.0.1:8000`.
 
 ## Frontend
 
@@ -116,6 +116,7 @@ Local backend (default):
 ```bash
 BACKEND_URL=http://127.0.0.1:8000
 NODE_ENV=development
+ADK_APP_NAME=rag_agent
 ```
 
 Agent Engine (direct streaming):
@@ -216,7 +217,7 @@ Use `NEXTJS_VERCEL_DEPLOYMENT_GUIDE.md` for step-by-step instructions. In short:
 
 - Missing Google Cloud envs: `app/config.py` validates env on import. Ensure `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, and `GOOGLE_CLOUD_STAGING_BUCKET` are set in `app/.env`.
 - Authentication for Agent Engine from the frontend requires `GOOGLE_SERVICE_ACCOUNT_KEY_BASE64` with correct scopes.
-- Local streaming issues: verify `BACKEND_URL` in `nextjs/.env.local` and that `make dev-backend` is running.
+- Local streaming issues: verify `BACKEND_URL` and `ADK_APP_NAME` in `nextjs/.env.local` and that `make dev-backend` is running.
 
 ## License
 
