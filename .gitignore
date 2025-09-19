@@ -247,3 +247,4 @@ Thumbs.db
 # Other
 web/
 credentials.json
+token.json
