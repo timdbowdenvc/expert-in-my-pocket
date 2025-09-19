@@ -1,8 +1,7 @@
-"""
-Agent Engine App - Deploy your agent to Google Cloud
 
-This file contains the logic to deploy your agent to Vertex AI Agent Engine.
-"""
+# Agent Engine App - Deploy your agent to Google Cloud
+
+# This file contains the logic to deploy your agent to Vertex AI Agent Engine.
 
 import copy
 import datetime
@@ -18,20 +17,24 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider, export
 from vertexai import agent_engines
 from vertexai.preview.reasoning_engines import AdkApp
+from dotenv import load_dotenv
 
-from app.agents.rag_agent.agent import root_agent as rag_agent
-from app.agents.research_agent.agent import root_agent as research_agent
+from app.agents.root_agent.agent import root_agent
 from app.agents.research_agent.config import get_deployment_config
 from app.utils.gcs import create_bucket_if_not_exists
 from app.utils.tracing import CloudTraceLoggingSpanExporter
 from app.utils.typing import Feedback
 
+# Load environment variables from .env file in the project root
+dotenv_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=dotenv_path)
 
 class AgentDeploymentConfig(TypedDict):
     agent: Any
     name: str
     description: str
     packages: list[str]
+    agent_id: str | None
 
 
 class AgentEngineApp(AdkApp):
@@ -40,8 +43,11 @@ class AgentEngineApp(AdkApp):
 
     This class extends the base ADK app with logging, tracing, and feedback capabilities.
     """
+    def __init__(self, agent_name: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.agent_name = agent_name
 
-    def set_up(self) -> None:
+    def set_up(self) -> None: 
         """Set up logging and tracing for the agent engine app."""
         super().set_up()
         logging_client = google_cloud_logging.Client()
@@ -50,7 +56,7 @@ class AgentEngineApp(AdkApp):
         processor = export.BatchSpanProcessor(
             CloudTraceLoggingSpanExporter(
                 project_id=os.environ.get("GOOGLE_CLOUD_PROJECT"),
-                service_name=f"{config.deployment_name}-service",
+                service_name=f"{self.agent_name}-service",
             )
         )
         provider.add_span_processor(processor)
@@ -73,6 +79,7 @@ class AgentEngineApp(AdkApp):
         template_attributes = self._tmpl_attrs
 
         return self.__class__(
+            agent_name=self.agent_name,
             agent=copy.deepcopy(template_attributes["agent"]),
             enable_tracing=bool(template_attributes.get("enable_tracing", False)),
             session_service_builder=template_attributes.get("session_service_builder"),
@@ -84,7 +91,7 @@ class AgentEngineApp(AdkApp):
 
 
 def deploy_agent(
-    agent: Any, agent_name: str, agent_description: str, extra_packages: list[str]
+    agent: Any, agent_name: str, agent_description: str, extra_packages: list[str], agent_id: str | None = None
 ) -> agent_engines.AgentEngine:
     """
     Deploy a single agent to Vertex AI Agent Engine.
@@ -94,6 +101,7 @@ def deploy_agent(
         agent_name: The display name for the agent.
         agent_description: A description for the agent.
         extra_packages: A list of extra packages to include in the deployment.
+        agent_id: The resource name of the agent to update.
 
     Returns:
         The deployed agent engine instance.
@@ -107,7 +115,15 @@ def deploy_agent(
     print(f"📋 Staging bucket: {deployment_config.staging_bucket}")
 
     # Step 2: Set up environment variables for the deployed agent
-    env_vars = {"NUM_WORKERS": "1"}
+    mcp_server_url = os.environ.get("REMOTE_MCP_SERVER_URL")
+    if not mcp_server_url:
+        raise ValueError("REMOTE_MCP_SERVER_URL environment variable not set in .env file.")
+
+    env_vars = {
+        "NUM_WORKERS": "1",
+        "MCP_SERVER_URL": mcp_server_url,
+        "ENVIRONMENT": "cloud",
+    }
 
     # Step 3: Create required Google Cloud Storage buckets
     artifacts_bucket_name = f"{deployment_config.project}-{agent_name}-logs-data"
@@ -131,6 +147,7 @@ def deploy_agent(
 
     # Step 6: Create the agent engine app
     agent_engine = AgentEngineApp(
+        agent_name=agent_name,
         agent=agent,
         artifact_service_builder=lambda: GcsArtifactService(
             bucket_name=artifacts_bucket_name
@@ -148,14 +165,19 @@ def deploy_agent(
     }
 
     # Step 8: Deploy or update the agent
-    existing_agents = list(agent_engines.list(filter=f"display_name='{agent_name}'"))
-
-    if existing_agents:
-        print(f"🔄 Updating existing agent: {agent_name}")
-        remote_agent = existing_agents[0].update(**agent_config)
+    if agent_id:
+        print(f"🔄 Updating existing agent by ID: {agent_id}")
+        agent_to_update = agent_engines.get(agent_id)
+        remote_agent = agent_to_update.update(**agent_config)
     else:
-        print(f"🆕 Creating new agent: {agent_name}")
-        remote_agent = agent_engines.create(**agent_config)
+        existing_agents = list(agent_engines.list(filter=f"display_name='{agent_name}'"))
+
+        if existing_agents:
+            print(f"🔄 Updating existing agent by name: {agent_name}")
+            remote_agent = existing_agents[0].update(**agent_config)
+        else:
+            print(f"🆕 Creating new agent: {agent_name}")
+            remote_agent = agent_engines.create(**agent_config)
 
     # Step 9: Save deployment metadata
     metadata = {
@@ -184,16 +206,16 @@ def deploy_all_agents() -> None:
     """Deploys all agents defined in the application."""
     agents_to_deploy: list[AgentDeploymentConfig] = [
         {
-            "agent": research_agent,
-            "name": "research-agent",
-            "description": "A research agent that can browse the web and generate reports.",
-            "packages": ["./app/agents/research_agent", "./app/utils"],
-        },
-        {
-            "agent": rag_agent,
-            "name": "rag-agent",
-            "description": "A RAG agent that can answer questions about documents.",
-            "packages": ["./app/agents/rag_agent", "./app/utils"],
+            "agent": root_agent,
+            "name": "t_level_agent",
+            "description": "A root agent that orchestrates sub-agents.",
+            "packages": [
+                "./app/agents/root_agent",
+                "./app/agents/rag_agent",
+                "./app/agents/slides_agent",
+                "./app/utils"
+            ],
+            "agent_id": "projects/496837674573/locations/europe-west4/reasoningEngines/6940082210150023168",
         },
     ]
 
@@ -203,6 +225,7 @@ def deploy_all_agents() -> None:
             agent_name=agent_config["name"],
             agent_description=agent_config["description"],
             extra_packages=agent_config["packages"],
+            agent_id=agent_config.get("agent_id"),
         )
 
 

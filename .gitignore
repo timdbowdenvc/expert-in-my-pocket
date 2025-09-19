@@ -22,6 +22,8 @@ MANIFEST
 
 # AI Docs
 ai_docs/
+!/ai_docs/templates/
+!/ai_docs/tasks/
 
 # Virtual environments
 .venv/
@@ -244,3 +246,4 @@ Thumbs.db
 
 # Other
 web/
+credentials.json

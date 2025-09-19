@@ -3,22 +3,17 @@
 import { useCallback, useEffect } from "react";
 import { useStreaming } from "@/hooks/useStreaming";
 import { useBackendHealth } from "@/hooks/useBackendHealth";
-import { Message } from "@/types";
-import { ProcessedEvent } from "@/components/ActivityTimeline";
+import { StreamEvent } from "@/lib/streaming/types";
 
 interface StreamingManagerProps {
   userId: string;
   sessionId: string;
-  onMessageUpdate: (message: Message) => void;
-  onEventUpdate: (messageId: string, event: ProcessedEvent) => void;
-  onWebsiteCountUpdate: (count: number) => void;
   onLoadingChange?: (isLoading: boolean) => void;
 }
 
 export interface StreamingManagerReturn {
   isLoading: boolean;
-  currentAgent: string;
-  submitMessage: (message: string) => Promise<void>;
+  submitMessage: (message: string) => ReadableStream<StreamEvent>;
 }
 
 /**
@@ -28,26 +23,20 @@ export interface StreamingManagerReturn {
 export function useStreamingManager({
   userId,
   sessionId,
-  onMessageUpdate,
-  onEventUpdate,
-  onWebsiteCountUpdate,
   onLoadingChange,
 }: StreamingManagerProps): StreamingManagerReturn {
   const { retryWithBackoff } = useBackendHealth();
 
-  const { isLoading, currentAgent, startStream } =
-    useStreaming(retryWithBackoff);
+  const { isLoading, startStream } = useStreaming(retryWithBackoff);
 
-  // Notify parent of loading state changes
   useEffect(() => {
     if (onLoadingChange) {
       onLoadingChange(isLoading);
     }
   }, [isLoading, onLoadingChange]);
 
-  // Submit a message for streaming
   const submitMessage = useCallback(
-    async (message: string): Promise<void> => {
+    (message: string): ReadableStream<StreamEvent> => {
       if (!message.trim() || !userId || !sessionId) {
         throw new Error("Message, userId, and sessionId are required");
       }
@@ -58,31 +47,13 @@ export function useStreamingManager({
         sessionId,
       };
 
-      try {
-        await startStream(
-          apiPayload,
-          onMessageUpdate,
-          onEventUpdate,
-          onWebsiteCountUpdate
-        );
-      } catch (error) {
-        console.error("Streaming error:", error);
-        throw error;
-      }
+      return startStream(apiPayload);
     },
-    [
-      userId,
-      sessionId,
-      startStream,
-      onMessageUpdate,
-      onEventUpdate,
-      onWebsiteCountUpdate,
-    ]
+    [userId, sessionId, startStream]
   );
 
   return {
     isLoading,
-    currentAgent,
     submitMessage,
   };
 }

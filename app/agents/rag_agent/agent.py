@@ -8,9 +8,8 @@ from .tools.get_corpus_info import get_corpus_info
 from .tools.list_corpora import list_corpora
 from .tools.rag_query import rag_query
 
-root_agent = Agent(
-    name="RagAgent",
-    # Using Gemini 2.5 Flash for best performance with RAG operations
+rag_agent = Agent(
+    name="rag_agent",
     model="gemini-2.5-flash",
     description="Vertex AI RAG Agent",
     tools=[
@@ -44,7 +43,7 @@ root_agent = Agent(
 
     When a user asks a question:
     1. First, determine if they want to manage corpora (list/create/add data/get info/delete) or query existing information.
-    2. If they're asking a knowledge question, use the `rag_query` tool to search the corpus.
+    2. If they're asking a knowledge question, use the `rag_query` tool to search the corpus. If there is no current corpus use Animal_Management_with_Sciences by default
     3. If they're asking about available corpora, use the `list_corpora` tool.
     4. If they want to create a new corpus, use the `create_corpus` tool.
     5. If they want to add data, ensure you know which corpus to add to, then use the `add_data` tool.

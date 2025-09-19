@@ -82,6 +82,7 @@ The frontend is designed to be deployed to Vercel. See `NEXTJS_VERCEL_DEPLOYMENT
 *   **Python:**
     *   The Python code is located in the `app` directory.
     *   The main agent logic is in `app/agent.py`.
+    *   All agents should use the "gemini-2.5-flash" model
     *   Configuration is handled in `app/config.py`.
     *   The project uses `ruff` for formatting and linting, and `mypy` for type checking.
 
