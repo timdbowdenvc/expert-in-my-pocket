@@ -1,10 +1,10 @@
-# T-Level Revision Assistant
+# Expert In My Pocket
 
-A production-ready fullstack template for a T-Level Revision Assistant, demonstrating how to connect a Python ADK backend to a modern Next.js frontend with streaming responses, local development, and deployment paths to Vertex AI Agent Engine and Vercel.
+A production-ready fullstack template for an Expert In My Pocket, demonstrating how to connect a Python ADK backend to a modern Next.js frontend with streaming responses, local development, and deployment paths to Vertex AI Agent Engine and Vercel.
 
 This repo contains:
 
-- Backend: A Python application using the Google ADK to power a T-Level revision assistant.
+- Backend: A Python application using the Google ADK to power an Expert In My Pocket.
 - Frontend: A Next.js application providing a chat interface for students.
 - Make targets and scripts for local development and cloud deployment.
 
@@ -29,7 +29,7 @@ By default the frontend runs at `http://localhost:3000` and proxies chat request
 
 ## Features
 
-- T-Level Revision Assistant powered by Google ADK (`app/agents/rag_agent/agent.py`)
+- Expert In My Pocket powered by Google ADK (`app/agent/rag_agent/agent.py`)
 - Environment-driven routing to either local backend or Vertex AI Agent Engine
 - Robust SSE pipeline with JSON-fragment processing for Agent Engine
 - Chat UI with message list, streaming content, and activity timeline
@@ -45,7 +45,7 @@ By default the frontend runs at `http://localhost:3000` and proxies chat request
 
 ```
 app/                       # Python ADK backend
-  agents/rag_agent/agent.py # Root agent definition (T-Level Revision Assistant)
+  agents/rag_agent/agent.py # Root agent definition (Expert In My Pocket)
   agent_engine_app.py      # Deployment helper for Vertex AI Agent Engine
   config.py                # Env loading, Vertex init, deployment config
   utils/                   # GCS + tracing helpers
@@ -65,7 +65,7 @@ pyproject.toml             # Python deps and linters
 
 ### Agent
 
-The agent is defined in `app/agents/rag_agent/agent.py`. It's a Retrieval Augmented Generation (RAG) agent that can answer questions about documents. For the T-Level Revision Assistant, you would populate its corpus with revision materials.
+The agent is defined in `app/agent/rag_agent/agent.py`. It's a Retrieval Augmented Generation (RAG) agent that can answer questions about documents. For the Expert In My Pocket, you would populate its corpus with revision materials.
 
 ### Environment
 
@@ -83,7 +83,7 @@ GOOGLE_CLOUD_STAGING_BUCKET=my-staging-bucket
 
 # Optional
 MODEL=gemini-2.5-flash
-AGENT_NAME=t-level-revision-agent
+AGENT_NAME=expert-in-my-pocket-agent
 EXTRA_PACKAGES=./app
 REQUIREMENTS_FILE=.requirements.txt
 ```
@@ -103,7 +103,7 @@ make dev-backend
 make dev
 ```
 
-This uses `uv run adk api_server app/agents --allow_origins="*"` which serves the ADK HTTP API at `http://127.0.0.1:8000`.
+This uses `uv run adk api_server app/agent --allow_origins="*"` which serves the ADK HTTP API at `http://127.0.0.1:8000`.
 
 ## Frontend
 

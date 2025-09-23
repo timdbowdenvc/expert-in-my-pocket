@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class DeploymentConfig:
     project: str
@@ -7,11 +8,12 @@ class DeploymentConfig:
     staging_bucket: str
     requirements_file: str
 
+
 def get_deployment_config() -> DeploymentConfig:
     """Returns the deployment configuration."""
     return DeploymentConfig(
-        project="t-level-assistant",
+        project="expert-in-my-pocket",
         location="europe-west4",
-        staging_bucket="t-level-assistant-adk-staging",
+        staging_bucket="expert-in-my-pocket-adk-staging",
         requirements_file=".requirements.txt",
     )

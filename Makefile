@@ -6,7 +6,7 @@ dev:
 	make dev-backend & make dev-frontend & make dev-mcp
 
 dev-backend:
-	uv run adk api_server app/agents --allow_origins="*"
+	uv run adk api_server . --allow_origins="*"
 
 dev-frontend:
 	npm --prefix nextjs run dev
@@ -15,7 +15,7 @@ dev-mcp:
 	uvicorn mcp_server.main:app --reload --port 8001
 
 adk-web:
-	uv run adk web app/agents --port 8501
+	uv run adk web app/agent --port 8501
 
 adk-web-test:
 	make adk-web & make dev-mcp

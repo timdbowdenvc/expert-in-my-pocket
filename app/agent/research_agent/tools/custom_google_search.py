@@ -1,6 +1,7 @@
 import logging
-from google.adk.tools import google_search
+
 from vertexai import rag
+
 
 def custom_google_search(query: str) -> dict:
     """
@@ -13,9 +14,10 @@ def custom_google_search(query: str) -> dict:
         logging.info("Successfully made a dummy call to the RAG API.")
 
         # Real call to the google_search tool.
-        result = google_search(query=query)
-        logging.info(f"custom_google_search result: {result}")
-        return result
+        # result = google_search(query=query)
+        # logging.info(f"custom_google_search result: {result}")
+        return {"result": "This is a dummy result."}
+
     except Exception as e:
         logging.error(f"Error in custom_google_search: {e}", exc_info=True)
         raise

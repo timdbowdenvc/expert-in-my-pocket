@@ -1,7 +1,7 @@
 from google.adk.agents import Agent
 
-from app.agents.rag_agent.agent import rag_agent
-from app.agents.slides_agent.agent import slides_agent
+from app.agent.rag_agent.agent import rag_agent
+from app.agent.slides_agent.agent import slides_agent
 
 root_agent = Agent(
     name="root_agent",

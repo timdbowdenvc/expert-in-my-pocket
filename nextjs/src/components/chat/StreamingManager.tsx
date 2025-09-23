@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import { useCallback, useEffect } from "react";
 import { useStreaming } from "@/hooks/useStreaming";
 import { useBackendHealth } from "@/hooks/useBackendHealth";
-import { StreamEvent } from "@/lib/streaming/types";
+import { StreamEvent, StreamProcessingCallbacks } from "@/lib/streaming/types";
 
-interface StreamingManagerProps {
+interface StreamingManagerProps extends StreamProcessingCallbacks {
   userId: string;
   sessionId: string;
   onLoadingChange?: (isLoading: boolean) => void;
@@ -13,7 +13,9 @@ interface StreamingManagerProps {
 
 export interface StreamingManagerReturn {
   isLoading: boolean;
-  submitMessage: (message: string) => ReadableStream<StreamEvent>;
+  currentAgent: string;
+  submitMessage: (message: string) => Promise<void>;
+  cancelStream: () => void;
 }
 
 /**
@@ -24,10 +26,18 @@ export function useStreamingManager({
   userId,
   sessionId,
   onLoadingChange,
+  onMessageUpdate,
+  onEventUpdate,
+  onWebsiteCountUpdate,
 }: StreamingManagerProps): StreamingManagerReturn {
   const { retryWithBackoff } = useBackendHealth();
 
-  const { isLoading, startStream } = useStreaming(retryWithBackoff);
+  const { isLoading, currentAgent, startStream, cancelStream } = useStreaming({
+    retryFn: retryWithBackoff,
+    onMessageUpdate,
+    onEventUpdate,
+    onWebsiteCountUpdate,
+  });
 
   useEffect(() => {
     if (onLoadingChange) {
@@ -36,7 +46,7 @@ export function useStreamingManager({
   }, [isLoading, onLoadingChange]);
 
   const submitMessage = useCallback(
-    (message: string): ReadableStream<StreamEvent> => {
+    async (message: string): Promise<void> => {
       if (!message.trim() || !userId || !sessionId) {
         throw new Error("Message, userId, and sessionId are required");
       }
@@ -47,13 +57,15 @@ export function useStreamingManager({
         sessionId,
       };
 
-      return startStream(apiPayload);
+      await startStream(apiPayload);
     },
     [userId, sessionId, startStream]
   );
 
   return {
     isLoading,
+    currentAgent,
     submitMessage,
+    cancelStream,
   };
 }

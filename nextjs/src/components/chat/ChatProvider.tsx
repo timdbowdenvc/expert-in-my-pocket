@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   createContext,
@@ -46,6 +46,7 @@ export interface ChatContextValue {
     requestSessionId?: string
   ) => Promise<void>;
   addMessage: (message: Message) => void;
+  cancelStream: () => void;
 
   // Refs for external access
   scrollAreaRef: React.RefObject<HTMLDivElement | null>;
@@ -173,15 +174,15 @@ export function ChatProvider({
             // Accumulate content progressively instead of replacing
             const updatedEvents = [...existingEvents];
             const existingEvent = updatedEvents[existingThinkingIndex];
-            const existingData =
+            const existingData = 
               existingEvent.data && typeof existingEvent.data === "object"
                 ? existingEvent.data
                 : {};
-            const existingContent =
+            const existingContent = 
               "content" in existingData ? String(existingData.content) : "";
-            const newContent =
-              event.data &&
-              typeof event.data === "object" &&
+            const newContent = 
+              event.data && 
+              typeof event.data === "object" && 
               "content" in event.data
                 ? String(event.data.content)
                 : "";
@@ -376,6 +377,7 @@ export function ChatProvider({
     // Message actions
     handleSubmit,
     addMessage,
+    cancelStream: streamingManager.cancelStream,
 
     // Refs
     scrollAreaRef,

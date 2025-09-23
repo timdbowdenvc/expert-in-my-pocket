@@ -3,7 +3,7 @@
 import { Target, ListChecks, CheckCircle } from "lucide-react";
 
 /**
- * EmptyState - T-Level Revision Assistant welcome screen
+ * EmptyState - Expert In My Pocket welcome screen
  * Extracted from ChatMessagesView empty state section
  * Displays when no messages exist in the current session
  */
@@ -24,8 +24,8 @@ export function EmptyState(): React.JSX.Element {
               <CheckCircle className="w-6 h-6 text-purple-500" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white">T-Level Revision Assistant</h1>
-          <p className="text-xl text-neutral-300">Your AI-powered study partner for T-Levels.</p>
+          <h1 className="text-4xl font-bold text-white">Expert In My Pocket</h1>
+          <p className="text-xl text-neutral-300">Your AI-powered study partner for anything.</p>
         </div>
 
         {/* Description */}
@@ -41,10 +41,7 @@ export function EmptyState(): React.JSX.Element {
             <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto">
               <Target className="w-6 h-6 text-green-500" />
             </div>
-            <h3 className="font-semibold text-green-400">T-Level Revision</h3>
-            <p className="text-sm text-neutral-400">
-              Covers all T-Level subjects and specifications.
-            </p>
+
           </div>
           <div className="space-y-3">
             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto">
