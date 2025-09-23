@@ -41,7 +41,10 @@ export function EmptyState(): React.JSX.Element {
             <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto">
               <Target className="w-6 h-6 text-green-500" />
             </div>
-
+            <h3 className="font-semibold text-blue-400">Practice Questions</h3>
+            <p className="text-sm text-neutral-400">
+              Query Company Documents.
+            </p>
           </div>
           <div className="space-y-3">
             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto">
@@ -49,7 +52,7 @@ export function EmptyState(): React.JSX.Element {
             </div>
             <h3 className="font-semibold text-blue-400">Practice Questions</h3>
             <p className="text-sm text-neutral-400">
-              Generate practice questions and get feedback on your answers.
+              Generate competitive analysis.
             </p>
           </div>
           <div className="space-y-3">
