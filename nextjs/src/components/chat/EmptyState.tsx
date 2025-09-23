@@ -59,9 +59,9 @@ export function EmptyState(): React.JSX.Element {
             <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto">
               <CheckCircle className="w-6 h-6 text-purple-500" />
             </div>
-            <h3 className="font-semibold text-purple-400">Concept Explanations</h3>
+            <h3 className="font-semibold text-purple-400">Use Tools</h3>
             <p className="text-sm text-neutral-400">
-              Get clear explanations of difficult concepts.
+              Use Agentic AI Tools.
             </p>
           </div>
         </div>
