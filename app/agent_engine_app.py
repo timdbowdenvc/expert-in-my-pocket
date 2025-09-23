@@ -53,16 +53,16 @@ class AgentEngineApp(AdkApp):
         super().set_up()
         logging_client = google_cloud_logging.Client()
         self.logger = logging_client.logger(__name__)
-        provider = TracerProvider()
-        processor = export.BatchSpanProcessor(
-            CloudTraceLoggingSpanExporter(
-                project_id=os.environ.get("GOOGLE_CLOUD_PROJECT"),
-                service_name=f"{self.agent_name}-service",
-            )
-        )
-        provider.add_span_processor(processor)
-        trace.set_tracer_provider(provider)
-        self.enable_tracing = True
+        # provider = TracerProvider()
+        # processor = export.BatchSpanProcessor(
+        #     CloudTraceLoggingSpanExporter(
+        #         project_id=os.environ.get("GOOGLE_CLOUD_PROJECT"),
+        #         service_name=f"{self.agent_name}-service",
+        #     )
+        # )
+        # provider.add_span_processor(processor)
+        # trace.set_tracer_provider(provider)
+        self.enable_tracing = False
 
     def register_feedback(self, feedback: dict[str, Any]) -> None:
         """Collect and log feedback from users."""
