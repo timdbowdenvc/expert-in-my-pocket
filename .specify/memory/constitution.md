@@ -73,7 +73,11 @@ Sync Impact Report:
     1.  Create a new feature branch for every new feature or bug fix.
     2.  Submit a pull request for code review.
     3.  Ensure all automated tests (linting, unit, integration) pass before requesting a review.
+- **Linting and Building**
+    1. Linting of the nextjs website in the nextjs folder by running npm run lint to catch any type errors.
+    2. When finished test the build of the nextjs website by running npm run build 
 - **Code Reviews:** All pull requests must be reviewed and approved by at least one other developer before being merged into the main branch.
+
 
 ## Governance
 

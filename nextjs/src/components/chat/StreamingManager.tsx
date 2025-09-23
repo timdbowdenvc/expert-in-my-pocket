@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react";
 import { useStreaming } from "@/hooks/useStreaming";
 import { useBackendHealth } from "@/hooks/useBackendHealth";
-import { StreamEvent, StreamProcessingCallbacks } from "@/lib/streaming/types";
+import { StreamProcessingCallbacks } from "@/lib/streaming/types";
 
 interface StreamingManagerProps extends StreamProcessingCallbacks {
   userId: string;

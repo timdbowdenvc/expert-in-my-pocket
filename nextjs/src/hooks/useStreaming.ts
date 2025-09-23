@@ -3,7 +3,6 @@ import { StreamingConnectionManager } from "@/lib/streaming/connection-manager";
 import { getEventTitle } from "@/lib/streaming/stream-utils";
 import {
   StreamingAPIPayload,
-  StreamEvent,
   StreamProcessingCallbacks,
 } from "@/lib/streaming/types";
 import { processSseEventData } from "@/lib/streaming/stream-processor";
