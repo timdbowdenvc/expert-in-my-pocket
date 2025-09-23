@@ -46,45 +46,46 @@
 - [ ] T001 Create project structure per implementation plan
 - [ ] T002 Initialize [language] project with [framework] dependencies
 - [ ] T003 [P] Configure linting and formatting tools
+- [ ] T004 [P] Update infrastructure as code (Dockerfile, netlify.toml, etc.)
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
-- [ ] T004 [P] Contract test POST /api/users in tests/contract/test_users_post.py
-- [ ] T005 [P] Contract test GET /api/users/{id} in tests/contract/test_users_get.py
-- [ ] T006 [P] Integration test user registration in tests/integration/test_registration.py
-- [ ] T007 [P] Integration test auth flow in tests/integration/test_auth.py
+- [ ] T005 [P] Contract test POST /api/users in tests/contract/test_users_post.py
+- [ ] T006 [P] Contract test GET /api/users/{id} in tests/contract/test_users_get.py
+- [ ] T007 [P] Integration test user registration in tests/integration/test_registration.py
+- [ ] T008 [P] Integration test auth flow in tests/integration/test_auth.py
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T008 [P] User model in src/models/user.py
-- [ ] T009 [P] UserService CRUD in src/services/user_service.py
-- [ ] T010 [P] CLI --create-user in src/cli/user_commands.py
-- [ ] T011 POST /api/users endpoint
-- [ ] T012 GET /api/users/{id} endpoint
-- [ ] T013 Input validation
-- [ ] T014 Error handling and logging
+- [ ] T009 [P] User model in src/models/user.py
+- [ ] T010 [P] UserService CRUD in src/services/user_service.py
+- [ ] T011 [P] CLI --create-user in src/cli/user_commands.py
+- [ ] T012 POST /api/users endpoint
+- [ ] T013 GET /api/users/{id} endpoint
+- [ ] T014 Input validation
+- [ ] T015 Error handling and logging
 
 ## Phase 3.4: Integration
-- [ ] T015 Connect UserService to DB
-- [ ] T016 Auth middleware
-- [ ] T017 Request/response logging
-- [ ] T018 CORS and security headers
+- [ ] T016 Connect UserService to DB
+- [ ] T017 Auth middleware
+- [ ] T018 Request/response logging
+- [ ] T019 CORS and security headers
 
 ## Phase 3.5: Polish
-- [ ] T019 [P] Unit tests for validation in tests/unit/test_validation.py
-- [ ] T020 Performance tests (<200ms)
-- [ ] T021 [P] Update docs/api.md
-- [ ] T022 Remove duplication
-- [ ] T023 Run manual-testing.md
+- [ ] T020 [P] Unit tests for validation in tests/unit/test_validation.py
+- [ ] T021 Performance tests (<200ms)
+- [ ] T022 [P] Update docs/api.md
+- [ ] T023 Remove duplication
+- [ ] T024 Run manual-testing.md
 
 ## Dependencies
-- Tests (T004-T007) before implementation (T008-T014)
-- T008 blocks T009, T015
-- T016 blocks T018
-- Implementation before polish (T019-T023)
+- Tests (T005-T008) before implementation (T009-T015)
+- T009 blocks T010, T016
+- T017 blocks T019
+- Implementation before polish (T020-T024)
 
 ## Parallel Example
 ```
-# Launch T004-T007 together:
+# Launch T005-T008 together:
 Task: "Contract test POST /api/users in tests/contract/test_users_post.py"
 Task: "Contract test GET /api/users/{id} in tests/contract/test_users_get.py"
 Task: "Integration test registration in tests/integration/test_registration.py"
@@ -112,7 +113,10 @@ Task: "Integration test auth in tests/integration/test_auth.py"
    - Each story → integration test [P]
    - Quickstart scenarios → validation tasks
 
-4. **Ordering**:
+4. **From Infrastructure**:
+    - Changes to deployment scripts or configurations → infrastructure tasks [P]
+
+5. **Ordering**:
    - Setup → Tests → Models → Services → Endpoints → Polish
    - Dependencies block parallel execution
 

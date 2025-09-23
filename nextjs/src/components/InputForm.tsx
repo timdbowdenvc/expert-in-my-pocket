@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,14 @@ interface InputFormProps {
   onSubmit: (query: string) => void;
   isLoading: boolean;
   context?: "homepage" | "chat"; // Add context prop for different placeholder text
+  cancelStream?: () => void;
 }
 
 export function InputForm({
   onSubmit,
   isLoading,
   context = "homepage",
+  cancelStream,
 }: InputFormProps): React.JSX.Element {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
@@ -94,6 +96,18 @@ export function InputForm({
               </div>
             )}
           </div>
+
+          {/* Cancel Button */}
+          {isLoading && cancelStream && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={cancelStream}
+              className="h-9 px-4 bg-red-500 hover:bg-red-600 text-white"
+            >
+              Cancel
+            </Button>
+          )}
 
           {/* Send Button */}
           <Button

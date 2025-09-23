@@ -30,9 +30,9 @@ export function ChatHeader(): React.JSX.Element {
           </div>
           <div>
             <h1 className="text-lg font-semibold text-slate-100">
-              T-Level Revision Assistant
+              Expert In My Pocket
             </h1>
-            <p className="text-xs text-slate-400">Your AI-powered study partner for T-Levels (Animal Management).</p>
+            <p className="text-xs text-slate-400">Your AI-powered study partner.</p>
           </div>
         </div>
 

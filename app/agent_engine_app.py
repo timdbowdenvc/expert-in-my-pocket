@@ -1,4 +1,3 @@
-
 # Agent Engine App - Deploy your agent to Google Cloud
 
 # This file contains the logic to deploy your agent to Vertex AI Agent Engine.
@@ -11,23 +10,24 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 import vertexai
+from dotenv import load_dotenv
 from google.adk.artifacts import GcsArtifactService
 from google.cloud import logging as google_cloud_logging
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider, export
 from vertexai import agent_engines
 from vertexai.preview.reasoning_engines import AdkApp
-from dotenv import load_dotenv
 
-from app.agents.root_agent.agent import root_agent
-from app.agents.research_agent.config import get_deployment_config
+from app.agent.research_agent.config import get_deployment_config
+from app.agent.root_agent.agent import root_agent
 from app.utils.gcs import create_bucket_if_not_exists
 from app.utils.tracing import CloudTraceLoggingSpanExporter
 from app.utils.typing import Feedback
 
 # Load environment variables from .env file in the project root
-dotenv_path = Path(__file__).parent.parent / '.env'
+dotenv_path = Path(__file__).parent.parent / ".env"
 load_dotenv(dotenv_path=dotenv_path)
+
 
 class AgentDeploymentConfig(TypedDict):
     agent: Any
@@ -43,11 +43,12 @@ class AgentEngineApp(AdkApp):
 
     This class extends the base ADK app with logging, tracing, and feedback capabilities.
     """
-    def __init__(self, agent_name: str, *args, **kwargs):
+
+    def __init__(self, agent_name: str, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.agent_name = agent_name
 
-    def set_up(self) -> None: 
+    def set_up(self) -> None:
         """Set up logging and tracing for the agent engine app."""
         super().set_up()
         logging_client = google_cloud_logging.Client()
@@ -91,7 +92,11 @@ class AgentEngineApp(AdkApp):
 
 
 def deploy_agent(
-    agent: Any, agent_name: str, agent_description: str, extra_packages: list[str], agent_id: str | None = None
+    agent: Any,
+    agent_name: str,
+    agent_description: str,
+    extra_packages: list[str],
+    agent_id: str | None = None,
 ) -> agent_engines.AgentEngine:
     """
     Deploy a single agent to Vertex AI Agent Engine.
@@ -117,7 +122,9 @@ def deploy_agent(
     # Step 2: Set up environment variables for the deployed agent
     mcp_server_url = os.environ.get("REMOTE_MCP_SERVER_URL")
     if not mcp_server_url:
-        raise ValueError("REMOTE_MCP_SERVER_URL environment variable not set in .env file.")
+        raise ValueError(
+            "REMOTE_MCP_SERVER_URL environment variable not set in .env file."
+        )
 
     env_vars = {
         "NUM_WORKERS": "1",
@@ -170,7 +177,9 @@ def deploy_agent(
         agent_to_update = agent_engines.get(agent_id)
         remote_agent = agent_to_update.update(**agent_config)
     else:
-        existing_agents = list(agent_engines.list(filter=f"display_name='{agent_name}'"))
+        existing_agents = list(
+            agent_engines.list(filter=f"display_name='{agent_name}'")
+        )
 
         if existing_agents:
             print(f"🔄 Updating existing agent by name: {agent_name}")
@@ -210,10 +219,10 @@ def deploy_all_agents() -> None:
             "name": "t_level_agent",
             "description": "A root agent that orchestrates sub-agents.",
             "packages": [
-                "./app/agents/root_agent",
-                "./app/agents/rag_agent",
-                "./app/agents/slides_agent",
-                "./app/utils"
+                "./app/agent/root_agent",
+                "./app/agent/rag_agent",
+                "./app/agent/slides_agent",
+                "./app/utils",
             ],
             "agent_id": "projects/496837674573/locations/europe-west4/reasoningEngines/6940082210150023168",
         },

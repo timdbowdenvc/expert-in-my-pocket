@@ -1,18 +1,3 @@
-<!--
-Sync Impact Report:
-- Version: 1.0.0 -> 1.1.0
-- Modified Principles:
-  - "Test-Driven Development (TDD) - NON-NEGOTIABLE" -> "Principle III: Test-Driven Development (TDD)" (clarified and expanded)
-- Added Sections:
-  - "Principle VI: Agent-Driven Development"
-  - "Principle VII: Infrastructure as Code (IaC)"
-- Removed Sections: None
-- Templates requiring updates:
-  - ✅ .specify/templates/plan-template.md
-  - ✅ .specify/templates/spec-template.md
-  - ✅ .specify/templates/tasks-template.md
-- Follow-up TODOs: None
--->
 # Expert In My Pocket Full-Stack Agent Constitution
 
 ## Core Principles
@@ -23,21 +8,14 @@ Sync Impact Report:
 ### II. User-Centric Design
 - The application shall be intuitive, responsive, and provide a seamless user experience. The primary goal of the frontend is to be a clear and effective interface to the power of the backend agents.
 
-### III. Test-Driven Development (TDD)
+### III. Test-Driven Development (TDD) - NON-NEGOTIABLE
 - All new features and bug fixes must begin with the creation of tests that verify the desired functionality or replicate the bug. The "Red-Green-Refactor" cycle is to be strictly followed. No production code is written without a failing test.
-- Tests should be specific, testing one thing at a time, and should be fast to run.
 
 ### IV. Cloud-Native Deployment
 - The application is designed for and deployed on modern cloud platforms: Netlify for the frontend, and Google Cloud (Vertex AI, Cloud Run) for the backend services. All development practices should align with this deployment strategy.
 
 ### V. Clear and Concise Code
 - Code should be easy to read, understand, and maintain. Follow the established coding style and conventions of the framework and language being used. Add comments only to explain *why* something is done, not *what* is being done.
-
-### VI. Agent-Driven Development
-- This project is developed using an agent-driven workflow, facilitated by the `.specify` directory. All new features and significant changes must be initiated through this workflow, starting with a specification, then a plan, and then tasks.
-
-### VII. Infrastructure as Code (IaC)
-- All infrastructure is to be defined as code. This includes Dockerfiles, Netlify configurations, and any other deployment scripts. This ensures that the infrastructure is repeatable, versionable, and easy to manage.
 
 ## Design Principles
 
@@ -50,7 +28,6 @@ Sync Impact Report:
 
 - **Component-Based Architecture:** All UI elements will be built as React components. Components should be small, reusable, and have a single, well-defined responsibility.
 - **State Management:** We will use React hooks for local component state and React Context (`ChatProvider`) for global chat-related state. This keeps our state management predictable and easy to trace.
-
 - **Streaming with React 19:** We will leverage the latest React 19 features, such as the `use` hook, for handling streaming data from the backend. This is the standard for ensuring a smooth and responsive user experience.
 - **Styling:** All styling will be done using TailwindCSS. Custom CSS should be avoided unless absolutely necessary.
 - **Testing:** All new components must have corresponding tests written using Jest and React Testing Library. User interactions should be tested where applicable.
@@ -80,4 +57,4 @@ Sync Impact Report:
 - This constitution is the single source of truth for all development practices in this project. It supersedes all previous conventions.
 - Any amendments to this constitution must be proposed in writing, documented, and approved by the project lead.
 
-**Version**: 1.1.0 | **Ratified**: 2025-09-19 | **Last Amended**: 2025-09-22
+**Version**: 1.0.0 | **Ratified**: 2025-09-19 | **Last Amended**: 2025-09-19
