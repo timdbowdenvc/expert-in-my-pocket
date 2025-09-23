@@ -216,7 +216,7 @@ def deploy_all_agents() -> None:
     agents_to_deploy: list[AgentDeploymentConfig] = [
         {
             "agent": root_agent,
-            "name": "t_level_agent",
+            "name": "root_agent",
             "description": "A root agent that orchestrates sub-agents.",
             "packages": [
                 "./app/agent/root_agent",
@@ -224,7 +224,7 @@ def deploy_all_agents() -> None:
                 "./app/agent/slides_agent",
                 "./app/utils",
             ],
-            "agent_id": "projects/496837674573/locations/europe-west4/reasoningEngines/6940082210150023168",
+            "agent_id": None,
         },
     ]
 
