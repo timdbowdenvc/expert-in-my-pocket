@@ -41,7 +41,7 @@ export function EmptyState(): React.JSX.Element {
             <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto">
               <Target className="w-6 h-6 text-green-500" />
             </div>
-            <h3 className="font-semibold text-blue-400">Practice Questions</h3>
+            <h3 className="font-semibold text-blue-400">Internal Research</h3>
             <p className="text-sm text-neutral-400">
               Query Company Documents.
             </p>
@@ -50,7 +50,7 @@ export function EmptyState(): React.JSX.Element {
             <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto">
               <ListChecks className="w-6 h-6 text-blue-500" />
             </div>
-            <h3 className="font-semibold text-blue-400">Practice Questions</h3>
+            <h3 className="font-semibold text-blue-400">Market Research</h3>
             <p className="text-sm text-neutral-400">
               Generate competitive analysis.
             </p>
