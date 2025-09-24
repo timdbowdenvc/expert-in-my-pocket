@@ -25,7 +25,7 @@ export function EmptyState(): React.JSX.Element {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white">Expert In My Pocket</h1>
-          <p className="text-xl text-neutral-300">Your AI-powered study partner for anything.</p>
+          <p className="text-xl text-neutral-300">Utilising AI to get best results.</p>
         </div>
 
         {/* Description */}
