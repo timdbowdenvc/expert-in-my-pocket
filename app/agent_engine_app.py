@@ -6,6 +6,7 @@ import copy
 import datetime
 import json
 import os
+import logging
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -17,12 +18,24 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider, export
 from vertexai import agent_engines
 from vertexai.preview.reasoning_engines import AdkApp
+from google.cloud.iam_admin_v1 import IAMClient
+from google.cloud.iam_admin_v1.types import ServiceAccount, CreateServiceAccountRequest
+from google.iam.v1.iam_policy_pb2 import SetIamPolicyRequest
+from google.api_core.exceptions import AlreadyExists
+from google.iam.v1.policy_pb2 import Binding
+from google.api_core.exceptions import NotFound
 
 from app.agent.research_agent.config import get_deployment_config
 from app.agent.root_agent.agent import root_agent
 from app.utils.gcs import create_bucket_if_not_exists
 from app.utils.tracing import CloudTraceLoggingSpanExporter
 from app.utils.typing import Feedback
+
+from google.cloud import resourcemanager_v3
+from google.api_core.exceptions import NotFound
+from google.iam.v1 import policy_pb2
+
+
 
 # Load environment variables from .env file in the project root
 dotenv_path = Path(__file__).parent.parent / ".env"
@@ -91,6 +104,74 @@ class AgentEngineApp(AdkApp):
         )
 
 
+
+def _create_service_account(project_id: str, service_account_id: str) -> str:
+    """
+    Creates a service account in the given project if it doesn't already exist.
+    
+    Args:
+        project_id: GCP project ID.
+        service_account_id: Unique service account ID (without domain).
+        
+    Returns:
+        The email address of the created or existing service account.
+    """
+    client = IAMClient()
+    parent = f"projects/{project_id}"
+
+    try:
+        # Create service account
+        request = CreateServiceAccountRequest(
+            name=parent,
+            account_id=service_account_id,
+            service_account=ServiceAccount(display_name=service_account_id),
+        )
+        service_account = client.create_service_account(request=request)
+        print(f"✅ Created service account: {service_account.email}")
+        return service_account.email
+
+    except AlreadyExists:
+        # If it already exists, fetch the existing service account
+        sa_name = f"projects/{project_id}/serviceAccounts/{service_account_id}@{project_id}.iam.gserviceaccount.com"
+        existing_sa = client.get_service_account(name=sa_name)
+        print(f"ℹ️ Service account already exists: {existing_sa.email}")
+        return existing_sa.email
+
+
+def _grant_service_account_roles(project_id: str, service_account_email: str, roles: list[str]):
+    """
+    Grants project-level roles to a service account using Cloud Resource Manager API.
+    """
+    client = resourcemanager_v3.ProjectsClient()
+    project_name = f"projects/{project_id}"
+
+    try:
+        policy = client.get_iam_policy(request={"resource": project_name})
+    except NotFound:
+        raise ValueError(f"Project {project_id} not found. Cannot grant roles.")
+
+    modified = False
+    member = f"serviceAccount:{service_account_email}"
+
+    # Convert bindings to dict-like lookup by role
+    bindings_by_role = {b.role: b for b in policy.bindings}
+
+    for role in roles:
+        if role in bindings_by_role:
+            if member not in bindings_by_role[role].members:
+                bindings_by_role[role].members.append(member)
+                modified = True
+        else:
+            new_binding = policy_pb2.Binding(role=role, members=[member])
+            policy.bindings.append(new_binding)
+            modified = True
+
+    if modified:
+        client.set_iam_policy(request={"resource": project_name, "policy": policy})
+        print(f"✅ Granted roles {roles} to {service_account_email}")
+    else:
+        print(f"ℹ️ {service_account_email} already has all requested roles.")
+
 def deploy_agent(
     agent: Any,
     agent_name: str,
@@ -130,6 +211,7 @@ def deploy_agent(
         "NUM_WORKERS": "1",
         "MCP_SERVER_URL": mcp_server_url,
         "ENVIRONMENT": "cloud",
+        "SERVICE_ACCOUNT_EMAIL": "ai-agent-account@timberyard-brain.iam.gserviceaccount.com",
     }
 
     # Step 3: Create required Google Cloud Storage buckets
@@ -140,6 +222,20 @@ def deploy_agent(
         project=deployment_config.project,
         location=deployment_config.location,
     )
+
+    # Create and configure service account for the agent
+    service_account_id = f"ai-agent-account"
+    service_account_email = _create_service_account(
+        deployment_config.project, service_account_id
+    )
+    _grant_service_account_roles(
+        deployment_config.project,
+        service_account_email,
+        [
+            "roles/aiplatform.user",
+        ],
+    )
+    print(f"Using service account: {service_account_email} for agent deployment.")
 
     # Step 4: Initialize Vertex AI for deployment
     vertexai.init(
