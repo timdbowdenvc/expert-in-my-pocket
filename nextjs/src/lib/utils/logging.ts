@@ -12,7 +12,7 @@ export function setLogLevel(level: LogLevel) {
   currentLogLevel = level;
 }
 
-export function redact(data: any): any {
+export function redact(data: Record<string, unknown>): Record<string, unknown> {
   const redactedData = { ...data };
   if (redactedData.prompt) {
     redactedData.prompt = 'REDACTED';
@@ -20,12 +20,12 @@ export function redact(data: any): any {
   return redactedData;
 }
 
-function cloudLog(level: LogLevel, event: string, data: any) {
+function cloudLog(level: LogLevel, event: string, data: Record<string, unknown>) {
   // Placeholder for a cloud logging service like Google Cloud Logging
   console.log(`[CLOUD] [${LogLevel[level]}] ${event}`, redact(data));
 }
 
-export function logEvent(event: string, data: any, level: LogLevel = LogLevel.INFO) {
+export function logEvent(event: string, data: Record<string, unknown>, level: LogLevel = LogLevel.INFO) {
   if (level >= currentLogLevel) {
     if (process.env.NODE_ENV === 'production') {
       cloudLog(level, event, data);
