@@ -1,22 +1,11 @@
-/**
- * Stream Processor
- *
- * This module handles the processing of parsed SSE data into UI updates.
- * It coordinates message updates, event timeline updates, and website count updates
- * based on the parsed SSE data.
- *
- * Implements the Official ADK Termination Signal Pattern:
- * - Streaming chunks are accumulated and displayed progressively
- * - Complete responses are used as termination signals (not displayed)
- * - When complete response matches accumulated text, streaming stops
- */
 
 import { flushSync } from "react-dom";
-import { Message } from "@/types";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
-import { StreamProcessingCallbacks } from "./types";
+import { createDebugLog } from "@/lib/handlers/run-sse-common";
+import { Message } from "@/types";
+import { logEvent } from "@/lib/utils/logging";
 import { extractDataFromSSE } from "./sse-parser";
-import { createDebugLog } from "../handlers/run-sse-common";
+import { StreamProcessingCallbacks } from "./types";
 
 /**
  * Processes SSE event data and triggers appropriate callbacks
@@ -40,6 +29,7 @@ export async function processSseEventData(
   currentAgentRef: { current: string },
   setCurrentAgent: (agent: string) => void
 ): Promise<void> {
+  logEvent('SSE event received', { jsonData });
   const { textParts, thoughtParts, agent, functionCall, functionResponse } =
     extractDataFromSSE(jsonData);
 

@@ -1,4 +1,4 @@
-from google.adk.agents import Agent
+from google.adk.agents import Agent, SequentialAgent, LlmAgent
 
 from app.agent.rag_agent.agent import rag_agent
 from app.agent.slides_agent.agent import slides_agent

@@ -15,6 +15,9 @@ interface MessageListProps {
   scrollAreaRef?: React.RefObject<HTMLDivElement | null>;
 }
 
+
+import { logEvent } from "@/lib/utils/logging";
+
 /**
  * Message list component that efficiently renders all messages
  * with proper scrolling and performance optimization
@@ -27,6 +30,7 @@ export function MessageList({
   copiedMessageId,
   scrollAreaRef,
 }: MessageListProps) {
+  logEvent('MessageList rendered', { messageCount: messages.length, isLoading });
   // If no messages, show empty state
   if (messages.length === 0) {
     return (
