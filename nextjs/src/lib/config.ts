@@ -122,12 +122,15 @@ export const endpointConfig = createEndpointConfig();
  * Utility function to get authentication headers for Google Cloud API calls
  */
 export async function getAuthHeaders(): Promise<Record<string, string>> {
+  console.log('getAuthHeaders called with deploymentType:', endpointConfig.deploymentType);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
+  console.log('deploymentType before if:', endpointConfig.deploymentType);
   // For Agent Engine deployment, we need proper Google Cloud authentication
   if (endpointConfig.deploymentType === "agent_engine") {
+    console.log('Inside if block for agent_engine');
     try {
       // Use base64-encoded service account key from environment variables (for Vercel deployment)
       const serviceAccountKeyBase64 =

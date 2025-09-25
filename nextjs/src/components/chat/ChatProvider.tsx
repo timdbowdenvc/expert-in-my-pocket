@@ -16,6 +16,8 @@ import { Message } from "@/types";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { loadSessionHistoryAction } from "@/lib/actions/session-history-actions";
+import { logEvent } from '@/lib/utils/logging';
+
 
 // Context value interface - consolidates all chat state and actions
 export interface ChatContextValue {
@@ -314,6 +316,7 @@ export function ChatProvider({
       requestUserId?: string,
       requestSessionId?: string
     ): Promise<void> => {
+      logEvent('Prompt submitted', { query });
       if (!query.trim()) return;
 
       // Use provided userId or current state

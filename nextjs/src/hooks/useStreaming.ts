@@ -6,7 +6,6 @@ import {
   StreamProcessingCallbacks,
 } from "@/lib/streaming/types";
 import { processSseEventData } from "@/lib/streaming/stream-processor";
-import { createDebugLog } from "@/lib/handlers/run-sse-common";
 
 export interface UseStreamingProps extends StreamProcessingCallbacks {
   retryFn: <T>(fn: () => Promise<T>) => Promise<T>;
