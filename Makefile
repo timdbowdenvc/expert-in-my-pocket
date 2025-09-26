@@ -3,7 +3,7 @@ install:
 	uv sync --all-extras && npm --prefix nextjs install
 
 dev:
-	make dev-backend & make dev-frontend & make dev-mcp
+	make -j 3 dev-backend & make dev-frontend & make dev-mcp
 
 dev-backend:
 	uv run adk api_server . --allow_origins="*"

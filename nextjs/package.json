@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "debug": "NODE_OPTIONS='--inspect' next dev"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",

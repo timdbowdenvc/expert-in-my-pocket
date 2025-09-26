@@ -2,12 +2,13 @@ from google.adk.agents import Agent, SequentialAgent, LlmAgent
 
 from app.agent.rag_agent.agent import rag_agent
 from app.agent.slides_agent.agent import slides_agent
+from app.agent.seo_agent.agent import seo_agent
 
 root_agent = Agent(
     name="root_agent",
     model="gemini-2.5-flash",
     description="Root Agent that can delegate to sub-agents for RAG and presentation generation.",
-    sub_agents=[rag_agent, slides_agent],
+    sub_agents=[rag_agent, seo_agent], # Initialize with an empty list of sub-agents
     tools=[],
     instruction="""
     # 🤖 Root Agent
@@ -18,6 +19,7 @@ root_agent = Agent(
 
     1. **rag_agent**: Use this agent for any questions about document corpora. This includes querying, creating, deleting, and managing documents.
     2. **slides_agent**: Use this agent to create Google Slides presentations.
+    3. **seo_agent**: Use this agent to perform SEO analysis on a given URL.
 
     ## How to Approach User Requests
 
@@ -25,6 +27,7 @@ root_agent = Agent(
 
     - If the question is about documents, files, or anything related to the project's stored data, delegate to the **rag_agent**.
     - If the user wants to create a presentation, use the **slides_agent**.
+    - If the user provides a URL and asks for SEO analysis, delegate to the **seo_agent**.
 
     ## Orchestration Workflows
 
@@ -37,3 +40,5 @@ root_agent = Agent(
     Provide a clear and concise answer based on the output of the sub-agent.
     """,
 )
+
+# Add sub-agents after root_agent is fully initialized

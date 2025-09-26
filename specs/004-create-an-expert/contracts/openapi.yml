@@ -1,0 +1,25 @@
+openapi: 3.0.0
+info:
+  title: SEO Agent API
+  version: 1.0.0
+paths:
+  /api/seo-agent:
+    post:
+      summary: Analyze a URL for SEO optimizations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: SEO analysis report
+          content:
+            text/markdown:
+              schema:
+                type: string
