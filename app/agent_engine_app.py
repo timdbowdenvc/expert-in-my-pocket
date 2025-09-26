@@ -318,9 +318,10 @@ def deploy_all_agents() -> None:
                 "./app/agent/root_agent",
                 "./app/agent/rag_agent",
                 "./app/agent/slides_agent",
+                "./app/agent/seo_agent",
                 "./app/utils",
             ],
-            "agent_id": None,
+            "agent_id": "projects/timberyard-brain/locations/europe-west4/reasoningEngines/3164658347529994240",
         },
     ]
 

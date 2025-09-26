@@ -35,6 +35,10 @@ By default the frontend runs at `http://localhost:3000` and proxies chat request
 - Chat UI with message list, streaming content, and activity timeline
 - Health checks and helpful error formatting
 
+## Available Commands
+
+- `/seo <URL>`: Analyzes the given URL for SEO optimizations and provides a report.
+
 ## Tech Stack
 
 - Backend: Python, `google-adk`, `vertexai`, `python-dotenv`
