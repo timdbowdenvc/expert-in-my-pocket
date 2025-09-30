@@ -29,6 +29,7 @@ export function MessageItem({
   onCopy,
   copiedMessageId,
 }: MessageItemProps) {
+  console.log("🎨 [MessageItem] Rendering with message:", JSON.stringify(message, null, 2));
   const handleCopy = (text: string, messageId: string) => {
     if (onCopy) {
       onCopy(text, messageId);
