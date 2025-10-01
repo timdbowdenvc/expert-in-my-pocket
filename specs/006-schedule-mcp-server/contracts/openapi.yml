@@ -1,0 +1,118 @@
+openapi: 3.0.0
+info:
+  title: Schedule MCP Server API
+  version: 1.0.0
+  description: API for the Schedule MCP Server to insert appointments into Google Calendar.
+
+servers:
+  - url: http://localhost:8000
+    description: Local Development Server
+
+paths:
+  /create-appointment:
+    post:
+      summary: Create a new Google Calendar appointment
+      description: Receives appointment data and inserts it into the specified Google Calendar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+      responses:
+        '200':
+          description: Appointment created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Appointment created successfully."
+                  event_url:
+                    type: string
+                    format: url
+                    example: "https://www.google.com/calendar/event?eid=..."
+        '400':
+          description: Bad Request - Invalid input data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Invalid appointment data provided."
+        '401':
+          description: Unauthorized - Authentication failed or token expired.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Authentication required or token invalid."
+        '404':
+          description: Not Found - Specified calendar does not exist or is inaccessible.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Calendar 'calendar_id' not found or inaccessible."
+        '500':
+          description: Internal Server Error - Failed to create appointment.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Failed to create appointment due to API error."
+
+components:
+  schemas:
+    AppointmentRequest:
+      type: object
+      required:
+        - title
+        - start_time
+        - end_time
+        - calendar_id
+      properties:
+        title:
+          type: string
+          description: The title/summary of the calendar event.
+          example: "Team Meeting"
+        start_time:
+          type: string
+          format: date-time
+          description: The start date and time of the event in ISO 8601 format.
+          example: "2025-10-26T10:00:00-07:00"
+        end_time:
+          type: string
+          format: date-time
+          description: The end date and time of the event in ISO 8601 format.
+          example: "2025-10-26T11:00:00-07:00"
+        calendar_id:
+          type: string
+          description: The unique identifier of the Google Calendar.
+          example: "primary"
+        description:
+          type: string
+          description: A detailed description of the event.
+          nullable: true
+          example: "Discuss Q4 strategy and project updates."
+        attendees:
+          type: array
+          items:
+            type: string
+            format: email
+          description: List of email addresses for attendees.
+          nullable: true
+          example: ["attendee1@example.com", "attendee2@example.com"]
