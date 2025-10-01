@@ -19,12 +19,11 @@ dependencies = [
     "pydantic",
     "fastapi",
     "uvicorn",
+    "google-api-python-client",
+    "google-auth-oauthlib",
     "google-cloud-aiplatform",
     "google-cloud-storage",
-    "google-auth",
-    "google-api-python-client",
     "google-auth-httplib2",
-    "google-auth-oauthlib",
     "beautifulsoup4",
     "requests",
     "requests-mock",
@@ -99,4 +98,4 @@ pythonpath = "."
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.hatch.build.targets.wheel]
-packages = ["app","nextjs"]
+packages = ["app","nextjs","mcp_server/schedule_mcp"]

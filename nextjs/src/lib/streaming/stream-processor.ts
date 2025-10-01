@@ -1,4 +1,3 @@
-
 import { flushSync } from "react-dom";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { createDebugLog } from "@/lib/handlers/run-sse-common";
@@ -236,15 +235,13 @@ function processThoughts(
       }
     );
 
-    // Create message for timeline attachment
-    // NOTE: This will be updated by text content processing if text arrives
-    flushSync(() => {
-      onMessageUpdate({
-        type: "ai",
-        content: "", // Empty initially - will be updated by text processing
-        id: aiMessageId,
-        timestamp: new Date(),
-      });
+    // 🔥 FIX: Use regular state update instead of flushSync for better stability
+    // flushSync can cause issues when called in rapid succession
+    onMessageUpdate({
+      type: "ai",
+      content: "", // Empty initially - will be updated by text processing
+      id: aiMessageId,
+      timestamp: new Date(),
     });
 
     createDebugLog(
@@ -267,13 +264,12 @@ function processThoughts(
 
     // Create separate timeline activity for each section
     sections.forEach((section) => {
-      flushSync(() => {
-        onEventUpdate(aiMessageId, {
-          title: section.title
-            ? `🤔 ${section.title}`
-            : `🤔 ${agent} is thinking...`,
-          data: { type: "thinking", content: section.content },
-        });
+      // 🔥 FIX: Use regular update instead of flushSync
+      onEventUpdate(aiMessageId, {
+        title: section.title
+          ? `🤔 ${section.title}`
+          : `🤔 ${agent} is thinking...`,
+        data: { type: "thinking", content: section.content },
       });
     });
   });
@@ -303,16 +299,17 @@ async function processTextContent(
     // if (newChunk == this.streamingTextMessage.text) { return; }
     if (text === currentAccumulated && currentAccumulated.length > 0) {
       // Official ADK pattern: this is the termination signal
-      // But we still need to ensure the final message state is preserved
       createDebugLog(
         "STREAM PROCESSOR",
-        "Received termination signal, ensuring final message state",
+        "✅ Received termination signal, ensuring final message state",
         {
           finalContentLength: currentAccumulated.length,
+          preview: currentAccumulated.substring(0, 100) + '...'
         }
       );
 
-      // Make sure the final message is properly set in the UI
+      // 🔥 CRITICAL FIX: Ensure the final message is set with flushSync
+      // This guarantees the UI has the complete message before streaming completes
       const finalMessage: Message = {
         type: "ai",
         content: currentAccumulated.trim(),
@@ -320,9 +317,15 @@ async function processTextContent(
         timestamp: new Date(),
       };
 
+      // Force synchronous update for final message to prevent race conditions
       flushSync(() => {
         onMessageUpdate(finalMessage);
       });
+      
+      // 🔥 ADDITIONAL FIX: Add small delay to ensure React has processed the update
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      console.log('[processTextContent] Final message sent to UI, length:', currentAccumulated.trim().length);
 
       return;
     }
@@ -338,9 +341,11 @@ async function processTextContent(
       timestamp: new Date(),
     };
 
-    // Force immediate update to prevent React batching
-    flushSync(() => {
-      onMessageUpdate(updatedMessage);
-    });
+    // 🔥 FIX: Use regular updates for streaming chunks, only flushSync for final
+    // This prevents excessive forced synchronous renders which can cause UI issues
+    onMessageUpdate(updatedMessage);
+    
+    // Small yield to prevent blocking
+    await new Promise(resolve => setTimeout(resolve, 0));
   }
 }
