@@ -1,0 +1,140 @@
+openapi: 3.0.0
+info:
+  title: Slides MCP Server API
+  version: 1.0.0
+  description: API for the Slides MCP Server to create Google Slides presentations.
+
+servers:
+  - url: http://localhost:8000
+    description: Local Development Server
+
+paths:
+  /create-presentation:
+    post:
+      summary: Create a new Google Slides presentation
+      description: Receives data from the slides agent and creates a new Google Slides presentation based on the provided content, template, and layouts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentationRequest'
+      responses:
+        '200':
+          description: Presentation created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Presentation created successfully."
+                  presentation_url:
+                    type: string
+                    format: url
+                    example: "https://docs.google.com/presentation/d/1234567890abcdefghijklmnopqrstuvwxyz"
+        '400':
+          description: Bad Request - Invalid input data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Invalid presentation data provided."
+        '500':
+          description: Internal Server Error - Failed to create presentation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Failed to create presentation due to API error."
+
+components:
+  schemas:
+    PresentationRequest:
+      type: object
+      required:
+        - title
+        - template_id
+        - slides
+      properties:
+        title:
+          type: string
+          description: The title of the new Google Slides presentation.
+          example: "Quarterly Business Review"
+        template_id:
+          type: string
+          description: Identifier for the pre-saved style/layout template to use.
+          example: "MyCompanyTemplate"
+        slides:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slide'
+
+    Slide:
+      type: object
+      required:
+        - elements
+      properties:
+        layout_id:
+          type: string
+          description: Optional identifier for a specific layout within the template.
+          example: "TitleAndBodyLayout"
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+
+    Element:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: Type of content element (e.g., text, image, shape).
+          enum: ["text", "image", "shape"]
+          example: "text"
+        content:
+          type: string
+          description: Textual content for 'text' type elements.
+          nullable: true
+          example: "This is a sample text."
+        image_url:
+          type: string
+          format: url
+          description: URL of the image for 'image' type elements.
+          nullable: true
+          example: "https://example.com/image.png"
+        position:
+          type: object
+          description: Defines placement and size of the element.
+          properties:
+            x:
+              type: number
+              description: X-coordinate.
+            y:
+              type: number
+              description: Y-coordinate.
+            width:
+              type: number
+              description: Width of the element.
+            height:
+              type: number
+              description: Height of the element.
+        style:
+          type: object
+          description: Basic styling properties for the element.
+          properties:
+            font_size:
+              type: number
+            font_family:
+              type: string
+            color:
+              type: string

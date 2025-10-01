@@ -108,7 +108,6 @@ export function useStreaming({
                   setCurrentAgent
                 );
 
-                await new Promise((resolve) => setTimeout(resolve, 0));
                 eventDataBuffer = "";
               }
             } else if (line.startsWith("data:")) {
@@ -130,8 +129,6 @@ export function useStreaming({
                 currentAgentRef,
                 setCurrentAgent
               );
-
-              await new Promise((resolve) => setTimeout(resolve, 0));
             }
             return;
           }
@@ -140,10 +137,23 @@ export function useStreaming({
         };
 
         await pump();
+        
+        // 🔥 CRITICAL FIX: Wait for React to finish all pending updates
+        // This ensures all flushSync calls have completed before we set isLoading to false
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
+        console.log('[useStreaming] Stream completed, final accumulated text length:', accumulatedTextRef.current.length);
+        
       } catch (error) {
         console.error("Streaming error:", error);
+        throw error; // Re-throw to allow parent to handle
       } finally {
-        setIsLoading(false);
+        // 🔥 CRITICAL FIX: Use setTimeout to ensure state updates complete
+        // This gives React time to process all the flushSync updates before we signal completion
+        setTimeout(() => {
+          setIsLoading(false);
+          console.log('[useStreaming] Loading state set to false');
+        }, 10); // Small delay to ensure UI updates complete
       }
     },
     [onMessageUpdate, onEventUpdate, onWebsiteCountUpdate]
@@ -153,6 +163,7 @@ export function useStreaming({
     if (connectionManager.current) {
       connectionManager.current.cancelRequest();
     }
+    setIsLoading(false);
   }, []);
 
   const getEventTitleCallback = useCallback((agentName: string): string => {
